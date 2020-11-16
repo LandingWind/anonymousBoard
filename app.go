@@ -7,7 +7,15 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.GET("/welcome", ctrl.ShowIndex)
+	// load views
+	r.LoadHTMLGlob("views/*")
 
-	r.Run("http://localhost:9001")
+	// router
+	// begin page
+	r.GET("/", ctrl.ShowIndex)
+	r.GET("/welcome", ctrl.ShowIndex)
+	// content page
+	r.GET("/content/:hash", ctrl.ShowContent)
+
+	r.Run(":9001")
 }
