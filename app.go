@@ -30,6 +30,7 @@ func main() {
 	{
 		contentAPI.POST("/create", api.CreateContent)
 	}
+	r.GET("/api/qa", api.GetQA)
 
 	r.Run(":9001")
 }
