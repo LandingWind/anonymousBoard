@@ -1,12 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>content</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.3.2/styles/github.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/2.0.0-dev.4/quill.snow.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/jquery-modal/0.9.2/jquery.modal.min.css" rel="stylesheet">
 </head>
+
 <body>
-    {{ .hash }}
-    {{ .content }}
+    <div class="modal" id="inputMasterKeyModal">
+        <span>masterKey:</span>
+        <input type="text" id="masterKey">
+        <button id="okModal">OK</button>
+    </div>
+    <div class="wrapper">
+        <div id="toolbar">
+            <select class="ql-font"></select>
+            <select class="ql-size"></select>
+            <button class="ql-bold">Bold</button>
+            <button class="ql-italic">Italic</button>
+            <button class="ql-underline"></button>
+            <button class="ql-strike"></button>
+            <select class="ql-color"></select>
+            <select class="ql-background"></select>
+            <button class="ql-header" value="1"></button>
+            <button class="ql-header" value="2"></button>
+            <button class="ql-blockquote"></button>
+            <button class="ql-code-block"></button>
+            <button class="ql-list" value="ordered"></button>
+            <button class="ql-list" value="bullet"></button>
+            <!-- self control -->
+            <div>
+                <button type="button" class="btn btn-primary" id="saveChange">Save</button>
+            </div>
+        </div>
+        <div id="editor"></div>
+    </div>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.3.2/highlight.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/quill/2.0.0-dev.4/quill.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+    <script>
+        hljs.configure({
+            languages: ['java', 'javaScript', 'python', 'c', 'c++', 'csharp', 'go', 'html', 'bash', 'swift', 'haskell', 'json', 'kotlin']
+        });
+        hljs.initHighlighting();
+
+        var editor = new Quill('#editor', {
+            modules: {
+                syntax: true,
+                toolbar: '#toolbar'
+            },
+            theme: 'snow',
+        });
+    </script>
+    <script>
+        // onLoad
+        const curUrlSplits = window.location.pathname.split("/");
+        const hash = curUrlSplits[curUrlSplits.length - 1];
+        $(function () {
+            $.ajax({
+                url: 'http://localhost:9001/api/content/get',
+                method: 'post',
+                data: {
+                    hash
+                },
+                success: function (result) {
+                    if (result.success) {
+                        editor.setContents(JSON.parse(result.content))
+                    } else {
+
+                    }
+                }
+            })
+        });
+    </script>
+    {{ if .lock }}
+    <script>
+        $("#inputMasterKeyModal").modal({
+            escapeClose: false,
+            clickClose: false,
+            showClose: false
+        })
+        $("#okModal").click(function() {
+            const curUrlSplits = window.location.pathname.split("/");
+            const hash = curUrlSplits[curUrlSplits.length - 1];
+            const masterKey = $("#masterKey").val();
+            const closeModal = $.modal.close;
+            $.ajax({
+                url: 'http://localhost:9001/api/content/get',
+                method: 'post',
+                data: {
+                    hash,
+                    masterKey,
+                },
+                success: function (result) {
+                    console.log(result)
+                    if (result.success) {
+                        editor.setContents(JSON.parse(result.content))
+                        closeModal();
+                    } else {
+                        alert(result.msg)
+                        $("#masterKey").val("")
+                    }
+                }
+            })
+        })
+    </script>
+    {{ end }}
+    <script>
+        $("#saveChange").click(function () {
+            const time = Date().toString()
+            const delta = editor.getContents();
+            const content = JSON.stringify(delta);
+            const curUrlSplits = window.location.pathname.split("/");
+            const hash = curUrlSplits[curUrlSplits.length - 1];
+            $.ajax({
+                url: 'http://localhost:9001/api/content/save',
+                method: 'post',
+                data: {
+                    content,
+                    hash
+                },
+                success: function (result) {
+                    console.log("saved success on", time, result)
+                }
+            })
+        })
+    </script>
 </body>
+<style>
+    .wrapper {
+        height: calc(100vh - 16px);
+    }
+
+    .ql-container {
+        height: calc(100% - 40px);
+    }
+
+    .ql-editor {
+        height: 100%;
+    }
+
+    .ql-snow .ql-editor .ql-code-block-container {
+        background-color: rgb(246, 248, 250);
+        color: rgb(36, 41, 46);
+        overflow: visible;
+    }
+</style>
+
 </html>

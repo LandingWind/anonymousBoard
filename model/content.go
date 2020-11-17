@@ -1,12 +1,15 @@
 package model
 
 import (
+	"fmt"
+
 	uuid "github.com/satori/go.uuid"
 )
 
-func GetContent(hash string) interface{} {
+// GetContent 获取数据
+func GetContent(hash string) map[string]string {
 	// use redis to fetch content
-	val := GetKeyValue(hash)
+	val := GetHMKeyValue(hash)
 	return val
 }
 
@@ -17,7 +20,7 @@ func GetNewHash() string {
 	for {
 		u1 := uuid.NewV4().String()
 		u2 := u1[0:fixedLen]
-		if !QueryKeyExist(u2) {
+		if !QueryHMKeyExist(u2) {
 			return u2
 		}
 	}
@@ -31,10 +34,19 @@ enterKey(optional)
 editKey(optional)
 masterKey
 */
-func CreateContent(keys map[string]string) string {
+func CreateContent(masterKey string, content string, lock string, editable string) (string, error) {
 	newHash := GetNewHash()
 	// store to redis
-	// storeValue := make(map[string]string)
-	SetKeyValue(newHash, "abc") // TODO: imple
-	return newHash
+	storeValue := make(map[string]interface{})
+	storeValue["masterKey"] = masterKey
+	storeValue["content"] = content
+	storeValue["lock"] = lock
+	storeValue["editable"] = editable
+	rdb := GetRedis()
+	setErr := rdb.HMSet(newHash, storeValue).Err()
+	if setErr != nil {
+		fmt.Println("insert into redis error")
+		return "", setErr
+	}
+	return newHash, nil
 }

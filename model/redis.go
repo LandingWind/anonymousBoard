@@ -24,6 +24,38 @@ func InitRedis() {
 	}
 }
 
+// QueryHMKeyExist 查询是否存在某一个key for hashmap
+func QueryHMKeyExist(key string) bool {
+	val, err := rdb.HGetAll(key).Result()
+	if err == redis.Nil || len(val) == 0 {
+		return false
+	} else if err != nil {
+		panic(err)
+	}
+	return true
+}
+
+// GetHMKeyValue 获取value for hashmap
+func GetHMKeyValue(key string) map[string]string {
+	val, err := rdb.HGetAll(key).Result()
+	if err == redis.Nil {
+		return nil
+	} else if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+// SetHMKeyValue 设置key-value for hashmap
+func SetHMKeyValue(key string, value map[string]interface{}) bool {
+	err := rdb.HMSet(key, value).Err()
+	if err != nil {
+		fmt.Printf("set key-value for hashmap error\n")
+		return false
+	}
+	return true
+}
+
 // QueryKeyExist 查询是否存在某一个key
 func QueryKeyExist(key string) bool {
 	_, err := rdb.Get(key).Result()
@@ -37,15 +69,13 @@ func QueryKeyExist(key string) bool {
 
 // GetKeyValue 获取value
 func GetKeyValue(key string) interface{} {
-	flag := QueryKeyExist(key)
-	if flag {
-		val, err := rdb.Get(key).Result()
-		if err != nil {
-			panic(err)
-		}
-		return val
+	val, err := rdb.Get(key).Result()
+	if err == redis.Nil {
+		return nil
+	} else if err != nil {
+		panic(err)
 	}
-	return nil
+	return val
 }
 
 // SetKeyValue 设置key-value
@@ -56,4 +86,9 @@ func SetKeyValue(key string, value interface{}) bool {
 		return false
 	}
 	return true
+}
+
+// GetRedis 直接获取 redis连 接进行操作
+func GetRedis() *redis.Client {
+	return rdb
 }

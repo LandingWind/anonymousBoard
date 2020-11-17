@@ -18,16 +18,22 @@ func ShowIndex(c *gin.Context) {
 func ShowContent(c *gin.Context) {
 	hash := c.Param("hash")
 	if hash == "" {
-		c.HTML(http.StatusOK, "404.html", gin.H{})
+		c.HTML(http.StatusOK, "404.html", gin.H{
+			"msg": "not support empty message token",
+		})
 		return
 	}
 	content := model.GetContent(hash)
-	if content == nil {
-		c.HTML(http.StatusOK, "404.html", gin.H{})
+	if len(content) == 0 {
+		c.HTML(http.StatusOK, "404.html", gin.H{
+			"msg": "not have this message",
+		})
 		return
 	}
 	c.HTML(http.StatusOK, "content.html", gin.H{
-		"hash":    hash,
-		"content": content,
+		"hash":     hash,
+		"content":  content["content"],
+		"editable": content["editable"] == "true",
+		"lock":     content["lock"] == "true",
 	})
 }

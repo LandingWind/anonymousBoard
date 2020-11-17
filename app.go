@@ -29,6 +29,8 @@ func main() {
 	contentAPI := r.Group("/api/content")
 	{
 		contentAPI.POST("/create", api.CreateContent)
+		contentAPI.POST("/save", api.SaveContent)
+		contentAPI.POST("/get", api.GetContent)
 	}
 	r.GET("/api/qa", api.GetQA)
 
