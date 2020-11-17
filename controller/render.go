@@ -18,15 +18,17 @@ func ShowIndex(c *gin.Context) {
 func ShowContent(c *gin.Context) {
 	hash := c.Param("hash")
 	if hash == "" {
-		c.HTML(http.StatusOK, "404.html", gin.H{
-			"msg": "not support empty message token",
+		c.Set("errorPage", gin.H{
+			"code": 400,
+			"msg":  "not support empty message token",
 		})
 		return
 	}
 	content := model.GetContent(hash)
 	if len(content) == 0 {
-		c.HTML(http.StatusOK, "404.html", gin.H{
-			"msg": "not have this message",
+		c.Set("errorPage", gin.H{
+			"code": 400,
+			"msg":  "not have this message",
 		})
 		return
 	}

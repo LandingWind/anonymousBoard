@@ -19,10 +19,13 @@ func CreateContent(c *gin.Context) {
 	hash, err := model.CreateContent(masterKey, content, lock)
 	fmt.Printf("hash: %s\n", hash)
 	if err != nil {
-		c.HTML(http.StatusOK, "404.html", gin.H{})
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
+		"success":    true,
 		"contentUrl": fmt.Sprintf("/content/%s", hash),
 	})
 }

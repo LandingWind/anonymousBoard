@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	ctrl "github.com/wkk5194/anonymousBoard/controller"
 	api "github.com/wkk5194/anonymousBoard/controller/api"
+	middleware "github.com/wkk5194/anonymousBoard/middleware"
 	model "github.com/wkk5194/anonymousBoard/model"
 )
 
@@ -17,6 +18,10 @@ func main() {
 	r := gin.Default()
 	// load views
 	r.LoadHTMLGlob("views/*")
+
+	// use middleware
+	r.Use(middleware.InjectTraceID)
+	r.Use(middleware.RenderErrorPage)
 
 	// render router
 	// begin page

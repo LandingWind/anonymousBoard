@@ -107,7 +107,11 @@
                 method: 'post',
                 data,
                 success: function (result) {
-                    window.location.href = result.contentUrl;
+                    if (result.success) {
+                        window.location.href = result.contentUrl;
+                    } else {
+                        alert(result.msg);
+                    }
                 }
             })
         })
