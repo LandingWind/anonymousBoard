@@ -23,7 +23,7 @@ func CreateContent(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"contentUrl": fmt.Sprintf("http://localhost:9001/content/%s", hash),
+		"contentUrl": fmt.Sprintf("/content/%s", hash),
 	})
 }
 

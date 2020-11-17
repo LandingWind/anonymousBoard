@@ -64,7 +64,7 @@
         const hash = curUrlSplits[curUrlSplits.length - 1];
         $(function () {
             $.ajax({
-                url: 'http://localhost:9001/api/content/get',
+                url: '/api/content/get',
                 method: 'post',
                 data: {
                     hash
@@ -90,7 +90,7 @@
             const masterKey = $("#masterKey").val();
             const closeModal = $.modal.close;
             $.ajax({
-                url: 'http://localhost:9001/api/content/get',
+                url: '/api/content/get',
                 method: 'post',
                 data: {
                     hash,
@@ -118,7 +118,7 @@
             const hash = curUrlSplits[curUrlSplits.length - 1];
             const masterKey = $("#masterKey").val();
             $.ajax({
-                url: 'http://localhost:9001/api/content/save',
+                url: '/api/content/save',
                 method: 'post',
                 data: {
                     content,
