@@ -61,11 +61,7 @@
                             </div>
                             <div class="form-group form-check">
                                 <input type="checkbox" class="form-check-input" id="lock">
-                                <label class="form-check-label" for="public">Private</label>
-                            </div>
-                            <div class="form-group form-check">
-                                <input type="checkbox" class="form-check-input" id="editable">
-                                <label class="form-check-label" for="editable">PublicEditable</label>
+                                <label class="form-check-label" for="public">Lock</label>
                             </div>
                         </form>
                     </div>
@@ -101,12 +97,10 @@
             const contentVal = $("#content").val();
             const content = `{"ops":[{"insert":"${contentVal}"}]}`;
             const lock = $("#lock").is(":checked");
-            const editable = $("#editable").is(":checked");
             const data = {
                 masterKey,
                 content,
                 lock,
-                editable,
             }
             $.ajax({
                 url: 'http://localhost:9001/api/content/create',

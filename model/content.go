@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"time"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -34,14 +35,16 @@ enterKey(optional)
 editKey(optional)
 masterKey
 */
-func CreateContent(masterKey string, content string, lock string, editable string) (string, error) {
+func CreateContent(masterKey string, content string, lock string) (string, error) {
 	newHash := GetNewHash()
 	// store to redis
 	storeValue := make(map[string]interface{})
-	storeValue["masterKey"] = masterKey
-	storeValue["content"] = content
-	storeValue["lock"] = lock
-	storeValue["editable"] = editable
+	storeValue["masterKey"] = masterKey                                    // 访问密钥
+	storeValue["content"] = content                                        // 内容
+	storeValue["lock"] = lock                                              // 是否上锁
+	storeValue["expireTime"] = time.Now().Add(time.Hour * 24 * 7).String() // 失效时间
+	storeValue["visitTime"] = 0                                            // 访问次数
+	storeValue["lastEditTime"] = time.Now().String()                       // 最后一次编辑的时间
 	rdb := GetRedis()
 	setErr := rdb.HMSet(newHash, storeValue).Err()
 	if setErr != nil {

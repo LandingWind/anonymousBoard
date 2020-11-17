@@ -14,10 +14,9 @@ func CreateContent(c *gin.Context) {
 	masterKey := c.PostForm("masterKey")
 	content := c.PostForm("content")
 	lock := c.PostForm("lock")
-	editable := c.PostForm("editable")
-	fmt.Printf("%s %s %s %s\n", masterKey, content, lock, editable)
+	fmt.Printf("%s %s %s %s\n", masterKey, content, lock)
 	//
-	hash, err := model.CreateContent(masterKey, content, lock, editable)
+	hash, err := model.CreateContent(masterKey, content, lock)
 	fmt.Printf("hash: %s\n", hash)
 	if err != nil {
 		c.HTML(http.StatusOK, "404.html", gin.H{})
@@ -29,17 +28,25 @@ func CreateContent(c *gin.Context) {
 }
 
 func SaveContent(c *gin.Context) {
-	content := c.PostForm("content")
+	contentData := c.PostForm("content")
 	hash := c.PostForm("hash")
-	if !model.QueryHMKeyExist(hash) {
+	content := model.GetHMKeyValue(hash)
+	if content == nil || len(content) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"msg":     "no this message token",
 		})
 		return
 	}
+	if content["lock"] == "true" && content["masterKey"] != c.PostForm("masterKey") {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"msg":     "wrong masterKey",
+		})
+		return
+	}
 	rds := model.GetRedis()
-	err := rds.HSet(hash, "content", content).Err()
+	err := rds.HSet(hash, "content", contentData).Err()
 	fmt.Printf("%j\n", err)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
