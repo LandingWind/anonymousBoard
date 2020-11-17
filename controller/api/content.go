@@ -61,6 +61,8 @@ func SaveContent(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 	})
+	// update lastEdit time
+	model.UpdateLastEditTime(hash)
 }
 
 func GetContent(c *gin.Context) {
@@ -86,6 +88,8 @@ func GetContent(c *gin.Context) {
 			"success": true,
 			"content": content["content"],
 		})
+		// update visit time
+		model.UpdateVisitTime(hash)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
