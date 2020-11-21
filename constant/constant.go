@@ -1,5 +1,5 @@
 package constant
 
 const (
-	LimitContentLen int = 5
+	LimitContentLen int = 20 * 1024 // 20KB
 )
