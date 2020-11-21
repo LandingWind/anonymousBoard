@@ -20,7 +20,9 @@ func main() {
 	r.LoadHTMLGlob("views/*")
 
 	// use middleware
+	// before handle main logic
 	r.Use(middleware.InjectTraceID)
+	// after handle main logic
 	r.Use(middleware.RenderErrorPage)
 
 	// render router
@@ -32,6 +34,7 @@ func main() {
 
 	// api router
 	contentAPI := r.Group("/api/content")
+	contentAPI.Use(middleware.LimitContentLength)
 	{
 		contentAPI.POST("/create", api.CreateContent)
 		contentAPI.POST("/save", api.SaveContent)
