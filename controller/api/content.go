@@ -20,7 +20,7 @@ func CreateContent(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"msg": err.Error(),
+			"msg":     err.Error(),
 		})
 		return
 	}
@@ -71,7 +71,7 @@ func GetContent(c *gin.Context) {
 	if content == nil || len(content) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"msg":     "no this message token",
+			"msg":     "no this message token or expired",
 		})
 		return
 	}
