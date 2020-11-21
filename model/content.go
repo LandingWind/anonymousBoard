@@ -52,7 +52,7 @@ func CreateContent(masterKey string, content string, lock string) (string, error
 	storeValue["lastEditTime"] = time.Now().Format(timeFormat)                       // 最后一次编辑的时间
 	rdb := GetRedis()
 	dbSize, err := rdb.DBSize().Result()
-	if (err != nil || dbSize >= 10000) {
+	if err != nil || dbSize >= 10000 {
 		return "", errors.New("redis db full, please try later")
 	}
 	setErr := rdb.HMSet(newHash, storeValue).Err()
