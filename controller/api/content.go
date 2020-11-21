@@ -20,6 +20,7 @@ func CreateContent(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
+			"msg": err.Error(),
 		})
 		return
 	}
