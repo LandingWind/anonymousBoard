@@ -75,15 +75,7 @@ func GetContent(c *gin.Context) {
 		})
 		return
 	}
-	if content["lock"] == "false" {
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"content": content["content"],
-		})
-		return
-	}
-	masterKey := c.PostForm("masterKey")
-	if content["masterKey"] == masterKey {
+	if content["lock"] == "false" || content["masterKey"] == c.PostForm("masterKey") {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"content": content["content"],
