@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -50,11 +51,18 @@ func CreateContent(masterKey string, content string, lock string) (string, error
 	storeValue["visitTime"] = 0                                                      // 访问次数
 	storeValue["lastEditTime"] = time.Now().Format(timeFormat)                       // 最后一次编辑的时间
 	rdb := GetRedis()
+	dbSize, err := rdb.DBSize().Result()
+	// redis storage full check
+	if err != nil || dbSize >= 10000 {
+		return "", errors.New("redis db full, please try later")
+	}
 	setErr := rdb.HMSet(newHash, storeValue).Err()
 	if setErr != nil {
 		fmt.Println("insert into redis error")
 		return "", setErr
 	}
+	// set expire time
+	rdb.Expire(newHash, time.Hour*24*7)
 	return newHash, nil
 }
 

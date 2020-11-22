@@ -14,13 +14,13 @@ func CreateContent(c *gin.Context) {
 	masterKey := c.PostForm("masterKey")
 	content := c.PostForm("content")
 	lock := c.PostForm("lock")
-	fmt.Printf("%s %s %s %s\n", masterKey, content, lock)
 	//
 	hash, err := model.CreateContent(masterKey, content, lock)
 	fmt.Printf("hash: %s\n", hash)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
+			"msg":     err.Error(),
 		})
 		return
 	}
@@ -71,7 +71,7 @@ func GetContent(c *gin.Context) {
 	if content == nil || len(content) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"msg":     "no this message token",
+			"msg":     "no this message token or expired",
 		})
 		return
 	}
